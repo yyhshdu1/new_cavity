@@ -1,11 +1,27 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pyvisa
 from windfreak import SynthHD
+import time
+import tqdm
+import csv
+from typing import List, Tuple
+import datetime
 
-synth = SynthHD('/dev/ttyACM0')
-synth.init()
+resource_name_windfreak = "COM4"
 
-# # Set channel 0 power and frequency
-# synth[0].power = -10.
-# synth[0].frequency = 2.e9
+synthd = SynthHD(resource_name_windfreak)
+synthd.init()
 
-# # Enable channel 0
-# synth[0].enable = True
+rf_out = 0
+
+synthd[rf_out].frequency = 100e6
+synthd[rf_out].power = -10
+synthd[rf_out].enable = True
+
+for shdpower in tqdm.tqdm(np.linspace(-30, 0, 51)):
+    synthd[rf_out].power = shdpower
+    time.sleep(1)
+
+synthd[rf_out].power = -20
+synthd[rf_out].enable = False
