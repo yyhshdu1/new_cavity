@@ -15,7 +15,7 @@ synthd.init()
 
 rf_out = 0
 
-synthd[rf_out].frequency = 100e6
+synthd[rf_out].frequency = 600e6
 synthd[rf_out].power = -10
 synthd[rf_out].enable = True
 
@@ -27,3 +27,4 @@ for shdfre in tqdm.tqdm(np.linspace(600e6, 1000e6, 10)):
 
 synthd[rf_out].power = -20
 synthd[rf_out].enable = False
+
