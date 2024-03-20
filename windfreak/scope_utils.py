@@ -10,7 +10,7 @@ from tqdm import tqdm
 def get_waveform(
     scope: pyvisa.resources.USBInstrument,
     ch,
-    max_pts: int = 250_000,
+    max_pts: int = 250000,
     tqdm_on: bool = True,
 ):
     # set the scope data format
@@ -30,6 +30,7 @@ def get_waveform(
     # get waveform data from scope
     curve = np.zeros(mdepth)
     tqdm_sq = tqdm if tqdm_on else lambda x: x
+    scope.write(":STOP")
     for i in tqdm_sq(range(int(np.ceil(mdepth / max_pts)))):
         # read a chunck from the scope
         i0, i1 = i * max_pts, i * max_pts + min(max_pts, mdepth - i * max_pts)
@@ -37,6 +38,7 @@ def get_waveform(
         scope.write(f":WAV:STOP {i1}")
         scope.write(":WAV:DATA?")
         raw_data = scope.read_raw()[11:-1]
+        print(len(raw_data))
         curve[i0:i1] = np.frombuffer(raw_data, dtype=np.uint8).astype(float)
 
         # convert raw data into voltage and time
@@ -86,8 +88,8 @@ def set_trigger(scope, source_ch, level, mode="EDGE", slope="POS", coupling="DC"
 @dataclass
 class TraceData:
     timestamp: npt.NDArray[np.float_]
-    transmission: npt.NDArray[np.float_]
-    #reflection: npt.NDArray[np.float_]
+    input: npt.NDArray[np.float_]
+    pickup: npt.NDArray[np.float_]
 
 
 def get_trace_data(scope: pyvisa.resources.USBInstrument, channels: Sequence[int]):
